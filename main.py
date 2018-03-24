@@ -49,7 +49,7 @@ def semperize(image_url):
 
 	#Display the image in the users default image browser.
 	buffered = BytesIO()
-	img.save(buffered, format="JPEG")
+	img.save(buffered, format="PNG")
 	return buffered
 
 
