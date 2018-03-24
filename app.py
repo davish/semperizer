@@ -1,11 +1,15 @@
 import cognitive_face as CF
 import requests
-from io import BytesIO
+from io import BytesIO, StringIO
 from PIL import Image, ImageDraw
 import boto3
 import base64
+from tempfile import NamedTemporaryFile
+from shutil import copyfileobj
+from os import remove
 
-from flask import Flask, request
+
+from flask import Flask, request, send_file
 
 def get_coords(faceDictionary):
     rect = faceDictionary['faceRectangle']
@@ -48,10 +52,14 @@ def semperize(image_url):
 		    img.paste(i, coords, i)
 
 	#Display the image in the users default image browser.
-	buffered = BytesIO()
-	img.save(buffered, format="PNG")
-	return buffered
+	return img
 
+
+def serve_pil_image(pil_img):
+    img_io = BytesIO()
+    pil_img.save(img_io, 'PNG', quality=70)
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/png')
 
 
 app = Flask(__name__)
@@ -64,5 +72,5 @@ def root():
 def uploaded():
 	url = 'https://s3.amazonaws.com/pkp-semperizer/' + request.args.get('key')
 	img = semperize(url)
-	img_str = base64.b64encode(img.getvalue())
-	return '<img src="data:image/png;base64,' + str(img_str) + '">'
+
+	return serve_pil_image(img)
