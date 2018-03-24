@@ -65,4 +65,4 @@ def uploaded():
 	url = 'https://s3.amazonaws.com/pkp-semperizer/' + request.args.get('key')
 	img = semperize(url)
 	img_str = base64.b64encode(img.getvalue())
-	return '<img src="data:image/png;base64,' + img_str + '">'
+	return '<img src="data:image/png;base64,' + str(img_str) + '">'
